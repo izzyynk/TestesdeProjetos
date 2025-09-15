@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class MatchEntity : MonoBehaviour
 {
     public MatchFeedBack _feedback;
     public MoveWithMouseDrag _movablePair;
+    public ScaleWithPivots _scaledObject;
     public Renderer _fixedPairRenderer;
     public MatchSystemManager _matchSystemManager;
     
@@ -23,7 +25,7 @@ public class MatchEntity : MonoBehaviour
 
     public void SetMaterialToPairs(Material PairMaterial)
     {
-        _movablePair.GetComponent<Renderer>().material = PairMaterial;
+        _scaledObject.GetComponent<Renderer>().material = PairMaterial;
         _fixedPairRenderer.material = PairMaterial;
     }
 

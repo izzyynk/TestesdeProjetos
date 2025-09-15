@@ -11,6 +11,7 @@ public class MoveWithMouseDrag : MonoBehaviour
     private bool isDragging = false;
     private Vector3 _initialPosition;
     private bool _connected;
+    private bool _snapped = false;
 
     private const string _portTag = "Port";
     private  const float _dragResponseThreshold = 2;
@@ -18,6 +19,7 @@ public class MoveWithMouseDrag : MonoBehaviour
     {
         mainCamera = Camera.main;
         CameraZDistance = mainCamera.WorldToScreenPoint(transform.position).z;
+        _initialPosition = transform.position;
     }
 
     
@@ -31,6 +33,7 @@ public class MoveWithMouseDrag : MonoBehaviour
             if (context.performed)
             {
                 isDragging = true;
+                _snapped = false;
             }
             else if (context.canceled)
             {
@@ -59,7 +62,7 @@ public class MoveWithMouseDrag : MonoBehaviour
        
     private void OnMouseUp()
     {
-        if(_connected)
+        if(_connected && !_snapped)
         {
             ResetPosition();
             transform.hasChanged = false;
@@ -85,6 +88,11 @@ public class MoveWithMouseDrag : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         _connected = true;
-        transform.position = other.transform.position;
+        isDragging = false;
+        _snapped = true;
+       Vector3 targetPosition = other.transform.position;
+        targetPosition.z = transform.position.z; // Mantém o Z original, se necessário
+        transform.position = targetPosition;
+        Debug.Log("Colidiu com: " + other.name + " e moveu para " + targetPosition);
     }
 }

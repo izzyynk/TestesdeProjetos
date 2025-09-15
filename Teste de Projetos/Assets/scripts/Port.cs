@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Port : MonoBehaviour
 {
-    private MatchEntity _ownerMatchEntity;
+    public MatchEntity _ownerMatchEntity;
     private void OnTriggerEnter(Collider other)
     {
         if(other.gameObject.TryGetComponent(out MoveWithMouseDrag CollidedMoveable))
