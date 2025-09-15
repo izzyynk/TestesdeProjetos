@@ -5,24 +5,22 @@ using UnityEngine.InputSystem;
 
 public class MoveWithMouseDrag : MonoBehaviour
 {
-    private PlayerInput playerInput;
-    private InputAction mouseDragAction;
     private Camera mainCamera;
     private float CameraZDistance;
-    
+    //public GameObject currentObject;
     private bool isDragging = false;
-    
+    private Vector3 _initialPosition;
+    private bool _connected;
 
+    private const string _portTag = "Port";
+    private  const float _dragResponseThreshold = 2;
     void Start()
     {
         mainCamera = Camera.main;
         CameraZDistance = mainCamera.WorldToScreenPoint(transform.position).z;
     }
 
-    private void OnMouseUp()
-    {
-        transform.hasChanged = false;
-    }
+    
 
     public void OnClick(InputAction.CallbackContext context)
     {
@@ -43,16 +41,50 @@ public class MoveWithMouseDrag : MonoBehaviour
 
     public void OnMouseDragScale(InputAction.CallbackContext context)
     {
+        Vector2 mousePosition = context.ReadValue<Vector2>();
+        Vector3 ScreenPosition = new Vector3(mousePosition.x, mousePosition.y, CameraZDistance);
+        Vector3 NewWorldPosition = mainCamera.ScreenToWorldPoint(ScreenPosition);
         if (isDragging)
         {
-            Vector2 mousePosition = context.ReadValue<Vector2>();
-            Vector3 ScreenPosition = new Vector3(mousePosition.x, mousePosition.y, CameraZDistance);
-            Vector3 NewWorldPosition = mainCamera.ScreenToWorldPoint(ScreenPosition);
+            _connected = true;
             transform.position = NewWorldPosition;
+        }
+        else if(Vector3.Distance(transform.position, NewWorldPosition)> _dragResponseThreshold) 
+        {
+            _connected = false;
         }
 
 
     }
        
+    private void OnMouseUp()
+    {
+        if(_connected)
+        {
+            ResetPosition();
+            transform.hasChanged = false;
+        }
+    }
 
+    public Vector3 GetPosition()
+    {
+        return transform.position;
+    }
+
+    public void SetInitialPosition(Vector3 NewPosition)
+    {
+        _initialPosition = NewPosition;
+        transform.position = _initialPosition;
+    }
+
+    private void ResetPosition()
+    {
+        transform.position = _initialPosition;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        _connected = true;
+        transform.position = other.transform.position;
+    }
 }
